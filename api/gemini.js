@@ -1,171 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>StockSense — Know What You Have. Know What You Need.</title>
-<link rel="stylesheet" href="stock.css">
-</head>
-<body>
+// /api/gemini.js
+// Serverless function (runs on Vercel, not in the browser).
+// Holds the real Gemini API key as a secret env var so no user ever sees it.
 
-<header class="header">
-  <div>
-    <div class="header-brand">StockSense</div>
-    <div class="header-tagline">Know What You Have. Know What You Need.</div>
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <div>
-      <div class="header-shop">Emeka's Shop</div>
-      <div class="header-alert" id="headerAlert"></div>
-    </div>
-  </div>
-</header>
+export default async function handler(req, res) {
+  // Only allow POST
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
+  }
 
-<nav class="nav">
-  <button class="nav-btn active" onclick="switchTab('stock')" id="nav-stock">
-    <span class="nav-icon">📦</span><span class="nav-label">Stock</span>
-    <span class="nav-badge" id="lowBadge" style="display:none"></span>
-  </button>
-  <button class="nav-btn" onclick="switchTab('restock')" id="nav-restock">
-    <span class="nav-icon">🔄</span><span class="nav-label">Restock</span>
-  </button>
-  <button class="nav-btn" onclick="switchTab('profit')" id="nav-profit">
-    <span class="nav-icon">💰</span><span class="nav-label">Profit</span>
-  </button>
-  <button class="nav-btn" onclick="switchTab('score')" id="nav-score">
-    <span class="nav-icon">⭐</span><span class="nav-label">ShopScore</span>
-  </button>
-</nav>
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    console.error('GEMINI_API_KEY is not set in environment variables');
+    return res.status(500).json({ error: 'Server missing GEMINI_API_KEY' });
+  }
 
-<div class="toast" id="toast"></div>
+  const { prompt } = req.body || {};
+  if (!prompt || typeof prompt !== 'string') {
+    return res.status(400).json({ error: 'Missing "prompt" string in request body' });
+  }
 
-<div class="content">
-  <!-- STOCK -->
-  <div class="tab-panel active" id="tab-stock">
-    <div class="stat-grid" id="stockStats"></div>
-    <div class="search-row">
-      <input class="search-input" placeholder="Search products..." oninput="renderStock(this.value)" id="searchInput"/>
-      <button class="btn btn-primary" onclick="openModal('addModal')">+ Add</button>
-    </div>
-    <div id="productList"></div>
-  </div>
+  // Basic abuse guard: cap prompt size
+  if (prompt.length > 8000) {
+    return res.status(400).json({ error: 'Prompt too long' });
+  }
 
-  <!-- RESTOCK -->
-  <div class="tab-panel" id="tab-restock">
-    <div id="restockAlerts"></div>
-    <div class="card">
-      <div class="card-title">🔥 Your Top Sellers</div>
-      <div id="topSellersList"></div>
-    </div>
-    <div class="ai-card">
-      <div class="ai-header">
-        <div class="ai-icon">✨</div>
-        <div><div class="ai-title">AI Restock Advisor</div><div class="ai-sub">Powered by Claude AI</div></div>
-      </div>
-      <div id="restockAI">
-        <div class="ai-desc">Get personalised restocking recommendations based on your actual sales data and stock levels.</div>
-        <button class="btn btn-primary btn-full" onclick="getRestockAdvice()">Generate Smart Advice</button>
-      </div>
-    </div>
-  </div>
+  try {
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      }
+    );
 
-  <!-- PROFIT -->
-  <div class="tab-panel" id="tab-profit">
-    <div class="stat-grid" id="profitStats"></div>
-    <div class="card">
-      <div class="card-title">📊 Weekly Sales</div>
-      <div class="chart-bars" id="chartBars"></div>
-      <div class="chart-tip">📈 Saturday is your best day. Consider stocking up on Fridays.</div>
-    </div>
-    <div class="card">
-      <div class="card-title">💰 Most Profitable Products</div>
-      <div id="profitBars"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📋 Cost vs Revenue</div>
-      <div id="costTable"></div>
-    </div>
-  </div>
+    // Read as raw text first so we never crash on a non-JSON response (e.g. HTML error pages)
+    const rawBody = await geminiRes.text();
 
-  <!-- SHOPSCORE -->
-  <div class="tab-panel" id="tab-score">
-    <div class="card score-circle-wrap">
-      <div class="score-circle-title">Your ShopScore</div>
-      <div class="score-svg-wrap">
-        <svg width="140" height="140" viewBox="0 0 140 140">
-          <circle cx="70" cy="70" r="56" fill="none" stroke="#f4f6fb" stroke-width="13"/>
-          <circle cx="70" cy="70" r="56" fill="none" stroke="#00a651" stroke-width="13"
-            stroke-linecap="round" id="scoreArc" style="transition:stroke-dasharray 1s ease;"/>
-        </svg>
-        <div class="score-inner">
-          <div class="score-number" id="scoreNumber">0</div>
-          <div class="score-of">out of 100</div>
-        </div>
-      </div>
-      <div style="margin-top:10px" id="scoreLabel"></div>
-      <div class="score-caption" id="scoreCaption"></div>
-    </div>
-    <div class="card">
-      <div class="card-title">📊 Score Breakdown</div>
-      <div id="signalBars"></div>
-    </div>
-    <div id="loanCard"></div>
-    <div class="ai-card">
-      <div class="ai-header">
-        <div class="ai-icon" style="background:var(--navy)">🤖</div>
-        <div><div class="ai-title">AI Business Assessment</div><div class="ai-sub">Powered by Claude AI</div></div>
-      </div>
-      <div id="scoreAI">
-        <div class="ai-desc">Get a personalised assessment of your business health and steps to improve your ShopScore.</div>
-        <button class="btn btn-primary btn-full" onclick="getScoreInsight()">Get My Assessment</button>
-      </div>
-    </div>
-  </div>
-</div>
+    let data;
+    try {
+      data = JSON.parse(rawBody);
+    } catch (parseErr) {
+      console.error('Gemini returned non-JSON response. Status:', geminiRes.status, 'Body (first 500 chars):', rawBody.slice(0, 500));
+      return res.status(502).json({
+        error: `Gemini returned a non-JSON response (status ${geminiRes.status}). This usually means the API key or endpoint is invalid.`,
+      });
+    }
 
-<!-- ADD MODAL -->
-<div class="modal-overlay" id="addModal">
-  <div class="modal">
-    <div class="modal-title">Add New Product</div>
-    <label class="form-label">Product Name *</label>
-    <input class="form-input" id="f-name" placeholder="e.g. Indomie Noodles"/>
-    <div class="form-row">
-      <div><label class="form-label">Quantity *</label><input class="form-input" id="f-qty" type="number" placeholder="0"/></div>
-      <div><label class="form-label">Min Qty Alert</label><input class="form-input" id="f-min" type="number" placeholder="5"/></div>
-    </div>
-    <div class="form-row">
-      <div><label class="form-label">Buying Price (₦) *</label><input class="form-input" id="f-buy" type="number" placeholder="0"/></div>
-      <div><label class="form-label">Selling Price (₦) *</label><input class="form-input" id="f-sell" type="number" placeholder="0"/></div>
-    </div>
-    <label class="form-label">Category</label>
-    <select class="form-select" id="f-cat">
-      <option>Food</option><option>Drinks</option><option>Household</option><option>Personal Care</option><option>Other</option>
-    </select>
-    <label class="form-label">Expiry Date (optional)</label>
-    <input class="form-input" id="f-exp" type="date"/>
-    <div class="modal-btns">
-      <button class="btn btn-primary" onclick="addProduct()">Add Product</button>
-      <button class="btn btn-ghost" onclick="closeModal('addModal')">Cancel</button>
-    </div>
-  </div>
-</div>
+    if (!geminiRes.ok) {
+      console.error('Gemini API error:', JSON.stringify(data));
+      return res.status(geminiRes.status).json({ error: data?.error?.message || 'Gemini request failed' });
+    }
 
-<!-- SELL MODAL -->
-<div class="modal-overlay" id="sellModal">
-  <div class="modal">
-    <div class="modal-title">Record Sale</div>
-    <div class="modal-sub" id="sellModalSub"></div>
-    <label class="form-label">Quantity Sold</label>
-    <input class="form-input" id="s-qty" type="number" value="1" min="1" oninput="updateSellPreview()"/>
-    <div class="preview-row" id="sellPreview"></div>
-    <div class="modal-btns">
-      <button class="btn btn-primary" onclick="confirmSale()">Confirm Sale</button>
-      <button class="btn btn-ghost" onclick="closeModal('sellModal')">Cancel</button>
-    </div>
-  </div>
-</div>
-
-<script src="stock.js"></script>
-<script src="gemini.js"></script>
-</body>
-</html>
+    const text = data.candidates?.[0]?.content?.parts?.map(p => p.text || '').join('') || '';
+    return res.status(200).json({ text });
+  } catch (err) {
+    console.error('Unhandled error calling Gemini:', err?.message || err);
+    return res.status(500).json({ error: 'Server error calling Gemini: ' + (err?.message || 'unknown') });
+  }
+}
