@@ -19,6 +19,21 @@ const profit=i=>(i.sellPrice-i.buyPrice)*i.sales;
 const margin=i=>(((i.sellPrice-i.buyPrice)/i.buyPrice)*100).toFixed(0);
 const bdg=(t,c)=>`<span class="badge" style="background:${c}18;color:${c}">${t}</span>`;
 
+async function callGemini(prompt){
+  const res=await fetch('/api/gemini',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({prompt})
+  });
+  if(!res.ok){
+    const errBody=await res.text();
+    throw new Error('gemini_error: '+errBody);
+  }
+  const data=await res.json();
+  const text=data.text||'';
+  return text;
+}
+
 function showToast(msg,color='#00a651'){const t=document.getElementById('toast');t.textContent=msg;t.style.background=color;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
 function switchTab(id){
@@ -129,13 +144,11 @@ async function getRestockAdvice(){
   const summary=stock.map(i=>`${i.name}: qty=${i.qty}, min=${i.minQty}, sales=${i.sales}, margin=${margin(i)}%, expiry=${i.expiry||'none'}`).join('\n');
   document.getElementById('restockAI').innerHTML=`<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div style="text-align:center;font-size:13px;color:var(--text2);padding-bottom:12px">Analysing your stock patterns...</div>`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:`You are a smart business advisor for a Nigerian small shop owner. Based on this stock data, give 4 specific, actionable restocking recommendations in JSON format only. No markdown, no preamble.\n\nStock data:\n${summary}\n\nReturn this exact JSON:\n[\n{"product":"name","action":"Restock Now|Restock Soon|Reduce Order|Stop Stocking","urgency":"high|medium|low","advice":"one sentence","qty":"number"}\n]`}]})});
-    const data=await res.json();
-    const text=data.content.map(b=>b.text||'').join('');
+    const text=await callGemini(`You are a smart business advisor for a Nigerian small shop owner. Based on this stock data, give 4 specific, actionable restocking recommendations in JSON format only. No markdown, no preamble.\n\nStock data:\n${summary}\n\nReturn this exact JSON:\n[\n{"product":"name","action":"Restock Now|Restock Soon|Reduce Order|Stop Stocking","urgency":"high|medium|low","advice":"one sentence","qty":"number"}\n]`);
     const items=JSON.parse(text.replace(/```json|```/g,'').trim());
     const uc={high:'#e63946',medium:'#f4a261',low:'#00a651'};
     document.getElementById('restockAI').innerHTML=items.map(a=>`<div class="ai-result-item"><div class="ai-result-header"><div class="ai-result-name">${a.product}</div>${bdg(a.action,uc[a.urgency]||'#0057b8')}</div><div class="ai-result-advice">${a.advice}</div>${a.qty?`<div class="ai-result-qty">Suggested restock: ${a.qty} units</div>`:''}</div>`).join('')+`<button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="getRestockAdvice()">Refresh Advice</button>`;
-  }catch{
+  }catch(err){
     document.getElementById('restockAI').innerHTML=`<div class="ai-result-item"><div class="ai-result-advice">Based on your data, Cabin Biscuit and Indomie Noodles are your fastest sellers and both need urgent restocking this week. Consider reducing Milo orders — it has low turnover relative to stock.</div></div><button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="getRestockAdvice()">Try Again</button>`;
   }
 }
@@ -186,11 +199,9 @@ async function getScoreInsight(){
   const d=window._scoreData||{};
   document.getElementById('scoreAI').innerHTML=`<div class="loading-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div><div style="text-align:center;font-size:13px;color:var(--text2);padding-bottom:12px">Analysing your business profile...</div>`;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:`You are a financial advisor for a Nigerian small shop owner. Based on this ShopScore data: ${JSON.stringify(d)}\n\nWrite a 3-sentence plain-English assessment of their business health and what they should do to improve their score and become eligible for a business loan. Be specific, encouraging, and practical. No markdown, no headers, just plain text.`}]})});
-    const data=await res.json();
-    const text=data.content.map(b=>b.text||'').join('');
+    const text=await callGemini(`You are a financial advisor for a Nigerian small shop owner. Based on this ShopScore data: ${JSON.stringify(d)}\n\nWrite a 3-sentence plain-English assessment of their business health and what they should do to improve their score and become eligible for a business loan. Be specific, encouraging, and practical. No markdown, no headers, just plain text.`);
     document.getElementById('scoreAI').innerHTML=`<div class="ai-insight">${text}</div><button class="btn btn-ghost btn-full" style="margin-top:10px" onclick="getScoreInsight()">Refresh Assessment</button>`;
-  }catch{
+  }catch(err){
     document.getElementById('scoreAI').innerHTML=`<div class="ai-insight">Your ShopScore shows a business with real potential and some clear areas to strengthen. Focus on restocking before items run out and recording every sale consistently — these two habits alone will significantly move your score. Keep it up and you will unlock OPay loan eligibility within weeks of consistent use.</div><button class="btn btn-ghost btn-full" style="margin-top:10px" onclick="getScoreInsight()">Try Again</button>`;
   }
 }
