@@ -9,9 +9,12 @@
 <body>
 
 <header class="header">
-  <div>
-    <div class="header-brand">StockSense</div>
-    <div class="header-tagline">Know What You Have. Know What You Need.</div>
+  <div class="header-left">
+    <img src="assets/logo-icon-transparent.png" alt="StockSense logo" class="logo-mark"/>
+    <div>
+      <div class="header-brand">StockSense</div>
+      <div class="header-tagline">Know What You Have. Know What You Need.</div>
+    </div>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <div>
@@ -23,17 +26,25 @@
 
 <nav class="nav">
   <button class="nav-btn active" onclick="switchTab('stock')" id="nav-stock">
-    <span class="nav-icon">📦</span><span class="nav-label">Stock</span>
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8L12 3 3 8v8l9 5 9-5V8z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg></span>
+    <span class="nav-label">Stock</span>
     <span class="nav-badge" id="lowBadge" style="display:none"></span>
   </button>
   <button class="nav-btn" onclick="switchTab('restock')" id="nav-restock">
-    <span class="nav-icon">🔄</span><span class="nav-label">Restock</span>
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0 1 15-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></span>
+    <span class="nav-label">Restock</span>
   </button>
   <button class="nav-btn" onclick="switchTab('profit')" id="nav-profit">
-    <span class="nav-icon">💰</span><span class="nav-label">Profit</span>
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
+    <span class="nav-label">Profit</span>
   </button>
   <button class="nav-btn" onclick="switchTab('score')" id="nav-score">
-    <span class="nav-icon">⭐</span><span class="nav-label">ShopScore</span>
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9"/></svg></span>
+    <span class="nav-label">ShopScore</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('daily')" id="nav-daily">
+    <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></span>
+    <span class="nav-label">Daily</span>
   </button>
 </nav>
 
@@ -54,13 +65,13 @@
   <div class="tab-panel" id="tab-restock">
     <div id="restockAlerts"></div>
     <div class="card">
-      <div class="card-title">🔥 Your Top Sellers</div>
+      <div class="card-title icon-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg> Your Top Sellers</div>
       <div id="topSellersList"></div>
     </div>
     <div class="ai-card">
       <div class="ai-header">
-        <div class="ai-icon">✨</div>
-        <div><div class="ai-title">AI Restock Advisor</div><div class="ai-sub">Powered by GEMINI AI</div></div>
+        <div class="ai-icon"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M3 12h3M18 12h3M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div><div class="ai-title">AI Restock Advisor</div><div class="ai-sub">Powered by Gemini AI</div></div>
       </div>
       <div id="restockAI">
         <div class="ai-desc">Get personalised restocking recommendations based on your actual sales data and stock levels.</div>
@@ -73,16 +84,16 @@
   <div class="tab-panel" id="tab-profit">
     <div class="stat-grid" id="profitStats"></div>
     <div class="card">
-      <div class="card-title">📊 Weekly Sales</div>
+      <div class="card-title icon-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Weekly Sales</div>
       <div class="chart-bars" id="chartBars"></div>
-      <div class="chart-tip">📈 Saturday is your best day. Consider stocking up on Fridays.</div>
+      <div class="chart-tip"><svg class="inline-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg> Saturday is your best day. Consider stocking up on Fridays.</div>
     </div>
     <div class="card">
-      <div class="card-title">💰 Most Profitable Products</div>
+      <div class="card-title icon-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Most Profitable Products</div>
       <div id="profitBars"></div>
     </div>
     <div class="card">
-      <div class="card-title">📋 Cost vs Revenue</div>
+      <div class="card-title icon-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6a1 1 0 0 1 1 1v2H8V3a1 1 0 0 1 1-1z"/><path d="M8 5H6a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><line x1="8" y1="11" x2="16" y2="11"/><line x1="8" y1="15" x2="16" y2="15"/></svg> Cost vs Revenue</div>
       <div id="costTable"></div>
     </div>
   </div>
@@ -94,7 +105,7 @@
       <div class="score-svg-wrap">
         <svg width="140" height="140" viewBox="0 0 140 140">
           <circle cx="70" cy="70" r="56" fill="none" stroke="#f4f6fb" stroke-width="13"/>
-          <circle cx="70" cy="70" r="56" fill="none" stroke="#00a651" stroke-width="13"
+          <circle cx="70" cy="70" r="56" fill="none" stroke="#20884b" stroke-width="13"
             stroke-linecap="round" id="scoreArc" style="transition:stroke-dasharray 1s ease;"/>
         </svg>
         <div class="score-inner">
@@ -106,18 +117,34 @@
       <div class="score-caption" id="scoreCaption"></div>
     </div>
     <div class="card">
-      <div class="card-title">📊 Score Breakdown</div>
+      <div class="card-title icon-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> Score Breakdown</div>
       <div id="signalBars"></div>
     </div>
     <div id="loanCard"></div>
     <div class="ai-card">
       <div class="ai-header">
-        <div class="ai-icon" style="background:var(--navy)">🤖</div>
-        <div><div class="ai-title">AI Business Assessment</div><div class="ai-sub">Powered by GEMINI AI</div></div>
+        <div class="ai-icon" style="background:var(--navy)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><line x1="12" y1="7" x2="12" y2="11"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg></div>
+        <div><div class="ai-title">AI Business Assessment</div><div class="ai-sub">Powered by Gemini AI</div></div>
       </div>
       <div id="scoreAI">
         <div class="ai-desc">Get a personalised assessment of your business health and steps to improve your ShopScore.</div>
         <button class="btn btn-primary btn-full" onclick="getScoreInsight()">Get My Assessment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DAILY -->
+  <div class="tab-panel" id="tab-daily">
+    <div class="stat-grid" id="dailyStats"></div>
+    <div class="card" id="dailyTopSeller"></div>
+    <div class="ai-card">
+      <div class="ai-header">
+        <div class="ai-icon" style="background:var(--amber)"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="3" x2="8" y2="7"/><line x1="16" y1="3" x2="16" y2="7"/></svg></div>
+        <div><div class="ai-title">Daily Business Briefing</div><div class="ai-sub">Powered by Gemini AI</div></div>
+      </div>
+      <div id="dailyAI">
+        <div class="ai-desc">Get an AI-generated summary of today's performance, trends vs yesterday, and a recommendation for tomorrow.</div>
+        <button class="btn btn-primary btn-full" onclick="getDailyAnalysis()">Generate Daily Summary</button>
       </div>
     </div>
   </div>
@@ -129,6 +156,8 @@
     <div class="modal-title">Add New Product</div>
     <label class="form-label">Product Name *</label>
     <input class="form-input" id="f-name" placeholder="e.g. Indomie Noodles"/>
+    <label class="form-label">Brand (optional)</label>
+    <input class="form-input" id="f-brand" placeholder="e.g. Indomie"/>
     <div class="form-row">
       <div><label class="form-label">Quantity *</label><input class="form-input" id="f-qty" type="number" placeholder="0"/></div>
       <div><label class="form-label">Min Qty Alert</label><input class="form-input" id="f-min" type="number" placeholder="5"/></div>
