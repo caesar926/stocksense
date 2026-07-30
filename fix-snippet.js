@@ -7,7 +7,7 @@ function addProduct(){
   const cat=document.getElementById('f-cat').value;
   const exp=document.getElementById('f-exp').value;
   const brand=document.getElementById('f-brand').value.trim();
-  if(!name||!qty||!buy||!sell)return showToast('Fill all required fields','#e63946');
+  if(!name||!qty||!buy||!sell)return showToast(t('toastFillFields'),'#e63946');
 
   // Check for an existing product with the same name + brand (case-insensitive).
   // If found, this is a RESTOCK: add to its quantity instead of creating a duplicate entry.
@@ -27,7 +27,7 @@ function addProduct(){
     ['f-name','f-brand','f-qty','f-min','f-buy','f-sell','f-exp'].forEach(id=>document.getElementById(id).value='');
     closeModal('addModal');
     renderStock(document.getElementById('searchInput').value);
-    showToast(`Restocked ${existing.name} — now ${existing.qty} units`);
+    showToast(`${t('toastRestocked')} ${existing.name} ${t('toastNowUnits')} ${existing.qty} ${t('toastUnits')}`);
     return;
   }
 
@@ -36,5 +36,5 @@ function addProduct(){
   ['f-name','f-brand','f-qty','f-min','f-buy','f-sell','f-exp'].forEach(id=>document.getElementById(id).value='');
   closeModal('addModal');
   renderStock(document.getElementById('searchInput').value);
-  showToast('Product added successfully');
+  showToast(t('toastProductAdded'));
 }
