@@ -11,7 +11,8 @@
   .auth-logo{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:6px;}
   .auth-logo img{width:40px;height:40px;}
   .auth-logo span{font-size:22px;font-weight:900;color:var(--navy);}
-  .auth-tagline{text-align:center;font-size:12px;color:var(--text2);margin-bottom:24px;}
+  .auth-tagline{text-align:center;font-size:12px;color:var(--text2);margin-bottom:18px;}
+  .auth-lang-bar{display:flex;gap:6px;justify-content:center;margin-bottom:18px;}
   .auth-tabs{display:flex;background:var(--bg);border-radius:12px;padding:4px;margin-bottom:22px;}
   .auth-tab{flex:1;text-align:center;padding:9px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;color:var(--text3);}
   .auth-tab.active{background:var(--surface);color:var(--navy);box-shadow:0 1px 4px rgba(0,0,0,.08);}
@@ -23,41 +24,49 @@
 </style>
 </head>
 <body>
+
 <div class="auth-wrap">
   <div class="auth-card">
     <div class="auth-logo">
       <img src="assets/logo-icon-transparent.png" alt="StockSense logo"/>
       <span>StockSense</span>
     </div>
-    <div class="auth-tagline">Know What You Have. Know What You Need.</div>
+    <div class="auth-tagline" data-i18n="tagline">Know What You Have. Know What You Need.</div>
+
+    <div class="auth-lang-bar">
+      <button class="lang-btn active" data-lang="en" onclick="setLang('en')">EN</button>
+      <button class="lang-btn" data-lang="ig" onclick="setLang('ig')">IG</button>
+      <button class="lang-btn" data-lang="ha" onclick="setLang('ha')">HA</button>
+      <button class="lang-btn" data-lang="yo" onclick="setLang('yo')">YO</button>
+    </div>
 
     <div class="auth-tabs">
-      <div class="auth-tab active" id="tab-login-btn" onclick="switchAuthTab('login')">Log In</div>
-      <div class="auth-tab" id="tab-signup-btn" onclick="switchAuthTab('signup')">Create Account</div>
+      <div class="auth-tab active" id="tab-login-btn" data-i18n="loginTab" onclick="switchAuthTab('login')">Log In</div>
+      <div class="auth-tab" id="tab-signup-btn" data-i18n="signupTab" onclick="switchAuthTab('signup')">Create Account</div>
     </div>
 
     <div class="auth-error" id="authError"></div>
 
     <!-- LOG IN FORM -->
     <div class="auth-form active" id="form-login">
-      <label class="form-label">Email</label>
+      <label class="form-label" data-i18n="labelEmail">Email</label>
       <input class="form-input" id="login-email" type="email" placeholder="you@example.com"/>
-      <label class="form-label">Password</label>
+      <label class="form-label" data-i18n="labelPassword">Password</label>
       <input class="form-input" id="login-password" type="password" placeholder="Your password"/>
-      <button class="btn btn-primary auth-submit" id="login-btn" onclick="handleLogin()">Log In</button>
+      <button class="btn btn-primary auth-submit" id="login-btn" data-i18n="btnLogin" onclick="handleLogin()">Log In</button>
     </div>
 
     <!-- SIGN UP FORM -->
     <div class="auth-form" id="form-signup">
-      <label class="form-label">Your Name</label>
+      <label class="form-label" data-i18n="labelYourName">Your Name</label>
       <input class="form-input" id="signup-name" placeholder="e.g. Emeka Obi"/>
-      <label class="form-label">Shop Name</label>
+      <label class="form-label" data-i18n="labelShopName">Shop Name</label>
       <input class="form-input" id="signup-shop" placeholder="e.g. Emeka's Shop"/>
-      <label class="form-label">Email</label>
-      <input class="form-input" id="signup-email" type="email" placeholder=""/>
-      <label class="form-label">Password</label>
+      <label class="form-label" data-i18n="labelEmail">Email</label>
+      <input class="form-input" id="signup-email" type="email" placeholder="you@example.com"/>
+      <label class="form-label" data-i18n="labelPassword">Password</label>
       <input class="form-input" id="signup-password" type="password" placeholder="At least 6 characters"/>
-      <button class="btn btn-primary auth-submit" id="signup-btn" onclick="handleSignup()">Create Account</button>
+      <button class="btn btn-primary auth-submit" id="signup-btn" data-i18n="btnCreateAccount" onclick="handleSignup()">Create Account</button>
     </div>
   </div>
 </div>
@@ -67,5 +76,6 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
 <script src="auth.js"></script>
+<script src="i18n.js"></script>
 </body>
 </html>
